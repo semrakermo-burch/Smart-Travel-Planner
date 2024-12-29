@@ -1,26 +1,17 @@
-package ibu.aisi.smart_travel_planner.core.model;
+package ibu.aisi.smart_travel_planner.core.dto;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-
-@Entity
-@Setter
+@Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@Table(name = "users")
-public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class UserDto {
     private Long id;
-
     private String email;
     private String firstName;
     private String lastName;
 }
-

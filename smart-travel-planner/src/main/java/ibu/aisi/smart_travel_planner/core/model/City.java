@@ -1,19 +1,17 @@
 package ibu.aisi.smart_travel_planner.core.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-
+@Setter
+@Getter
+@Table(name = "cities")
 public class City {
 
     @Id
