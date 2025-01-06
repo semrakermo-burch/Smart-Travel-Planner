@@ -2,6 +2,7 @@ package ibu.aisi.smart_travel_planner.rest.controller;
 
 import ibu.aisi.smart_travel_planner.core.dto.TripDto;
 import ibu.aisi.smart_travel_planner.core.service.TripService;
+import okhttp3.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,6 +44,11 @@ public class TripController {
         tripService.deleteTrip(id);
         return ResponseEntity.noContent().build();
     }
-}
+
+    @PostMapping("/suggestion")
+    public ResponseEntity<String> suggestTrip(@RequestBody List<String> interests) {
+        return ResponseEntity.ok(tripService.suggestTrip(interests));
+    }
+    }
 
 

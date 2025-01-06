@@ -1,5 +1,6 @@
 package ibu.aisi.smart_travel_planner.core.service;
 
+import ibu.aisi.smart_travel_planner.core.api.tripsuggester.TripSuggester;
 import ibu.aisi.smart_travel_planner.core.dto.TripDto;
 import ibu.aisi.smart_travel_planner.core.model.Trip;
 import ibu.aisi.smart_travel_planner.core.repository.TripRepository;
@@ -14,10 +15,12 @@ public class TripService {
 
     private final TripRepository tripRepository;
     private final ModelMapper mapper;
+    private final TripSuggester tripSuggester;
 
-    public TripService(TripRepository tripRepository, ModelMapper mapper) {
+    public TripService(TripRepository tripRepository, ModelMapper mapper, TripSuggester tripSuggester) {
         this.tripRepository = tripRepository;
         this.mapper = mapper;
+        this.tripSuggester = tripSuggester;
     }
 
     public List<TripDto> getAllTrips() {
@@ -54,6 +57,10 @@ public class TripService {
         return tripRepository.findByUserId(userId).stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
+    }
+
+    public String suggestTrip(List<String> interests) {
+        return tripSuggester.suggestTrip(interests);
     }
 
     private TripDto mapToDto(Trip trip) {

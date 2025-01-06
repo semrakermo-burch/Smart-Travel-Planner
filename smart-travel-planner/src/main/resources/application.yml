@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/travelplanner?useSSL=false
-    username: postgres
-    password: semrakermo
+    url: ${db_url}
+    username: ${db_username}
+    password: ${db_password}
     driver-class-name: org.postgresql.Driver
   jpa:
     properties:
@@ -13,3 +13,6 @@ spring:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     show-sql: false
+
+openai:
+  secret: ${openai_sk}

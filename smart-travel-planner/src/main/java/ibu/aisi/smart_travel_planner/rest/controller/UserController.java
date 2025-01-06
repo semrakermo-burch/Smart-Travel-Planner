@@ -5,8 +5,6 @@ import ibu.aisi.smart_travel_planner.core.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -27,11 +25,6 @@ public class UserController {
     public ResponseEntity<UserDto> getUserByEmail(@PathVariable String email) {
         UserDto userDto = userService.getUserByEmail(email);
         return userDto != null ? ResponseEntity.ok(userDto) : ResponseEntity.notFound().build();
-    }
-
-    @PostMapping
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDTO) {
-        return ResponseEntity.ok(userService.createUser(userDTO));
     }
 
     @DeleteMapping("/{id}")

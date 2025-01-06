@@ -2,15 +2,13 @@ package ibu.aisi.smart_travel_planner.core.model;
 
 import jakarta.persistence.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
 @Entity
 @Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -24,7 +22,11 @@ public class Trip {
     private String name;
 
     private String description;
+
+    @Column(name = "start_date")
     private Date startDate;
+
+    @Column(name = "end_date")
     private Date endDate;
     private String status; // "Upcoming" or "Completed"
 

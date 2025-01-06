@@ -1,10 +1,7 @@
 package ibu.aisi.smart_travel_planner.core.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 
 @Entity
@@ -12,6 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Getter
 @Table(name = "users")
 public class User {
 
@@ -20,7 +18,11 @@ public class User {
     private Long id;
 
     private String email;
+
+    @Column(name = "first_name")
     private String firstName;
+
+    @Column(name = "last_name")
     private String lastName;
 }
 

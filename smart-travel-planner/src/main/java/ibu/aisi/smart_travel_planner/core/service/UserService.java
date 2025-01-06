@@ -17,12 +17,6 @@ public class UserService {
         this.mapper = mapper;
     }
 
-    public UserDto createUser(UserDto userDto) {
-        User user = mapToEntity(userDto);
-        User savedUser = userRepository.save(user);
-        return mapToDto(savedUser);
-    }
-
     public UserDto getUserById(Long id) {
         return userRepository.findById(id)
                 .map(this::mapToDto)
@@ -30,6 +24,17 @@ public class UserService {
     }
 
     public UserDto getUserByEmail(String email) {
+        User a = userRepository.findByEmail(email).get();
+        System.out.println(a);
+        UserDto b = mapToDto(a);
+        System.out.println(b);
+        UserDto userDto = new UserDto();
+        userDto.setId(a.getId());
+        userDto.setEmail(a.getEmail());
+        userDto.setFirstName(a.getFirstName());
+        userDto.setLastName(a.getLastName());
+
+        System.out.println("Mapped UserDto manually: " + userDto);
         return userRepository.findByEmail(email)
                 .map(this::mapToDto)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -41,10 +46,6 @@ public class UserService {
 
     private UserDto mapToDto(User user) {
         return mapper.map(user, UserDto.class);
-    }
-
-    private User mapToEntity(UserDto userDto) {
-        return mapper.map(userDto, User.class);
     }
 }
 
