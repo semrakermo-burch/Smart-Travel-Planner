@@ -16,3 +16,7 @@ spring:
 
 openai:
   secret: ${openai_sk}
+
+weatherapi:
+  url: https://api.weatherapi.com/v1
+  key: ${weatherapi_key}
