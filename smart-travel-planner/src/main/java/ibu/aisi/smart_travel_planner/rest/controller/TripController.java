@@ -1,11 +1,13 @@
 package ibu.aisi.smart_travel_planner.rest.controller;
 
+import ibu.aisi.smart_travel_planner.api.impl.weatherapi.WeatherApiWeatherForecast;
 import ibu.aisi.smart_travel_planner.core.dto.TripDto;
+import ibu.aisi.smart_travel_planner.core.dto.WeatherDto;
 import ibu.aisi.smart_travel_planner.core.service.TripService;
-import okhttp3.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -13,9 +15,11 @@ import java.util.List;
 public class TripController {
 
     private final TripService tripService;
+    private final WeatherApiWeatherForecast weatherService;
 
-    public TripController(TripService tripService) {
+    public TripController(TripService tripService, WeatherApiWeatherForecast weatherService) {
         this.tripService = tripService;
+        this.weatherService = weatherService;
     }
 
     @GetMapping
@@ -48,6 +52,14 @@ public class TripController {
     @PostMapping("/suggestion")
     public ResponseEntity<String> suggestTrip(@RequestBody List<String> interests) {
         return ResponseEntity.ok(tripService.suggestTrip(interests));
+    }
+
+    @GetMapping("/{id}/weather-forecast")
+    public WeatherDto getWeatherForTrip(Long tripId) {
+        // Fetch Trip (Assume trip exists)
+        TripDto trip = tripService.getTripById(tripId);
+        LocalDate startDate = trip.getStartDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+        return weatherService.getWeatherForecast(trip.getCity().getName(), startDate);
     }
     }
 

@@ -20,4 +20,5 @@ public class TripDto {
     private String status; // "Upcoming" or "Completed"
     private Long userId;   // User ID for the trip owner
     private Long cityId;   // City ID for the trip destination
+    private CityDto city;
 }
