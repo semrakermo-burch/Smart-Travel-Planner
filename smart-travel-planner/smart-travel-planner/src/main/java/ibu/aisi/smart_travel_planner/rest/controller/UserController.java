@@ -21,6 +21,7 @@ public class UserController {
         return userDto != null ? ResponseEntity.ok(userDto) : ResponseEntity.notFound().build();
     }
 
+
     @GetMapping("/email/{email}")
     public ResponseEntity<UserDto> getUserByEmail(@PathVariable String email) {
         UserDto userDto = userService.getUserByEmail(email);

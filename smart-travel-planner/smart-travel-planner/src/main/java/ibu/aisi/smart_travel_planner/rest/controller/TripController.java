@@ -33,14 +33,19 @@ public class TripController {
         return tripDto != null ? ResponseEntity.ok(tripDto) : ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<TripDto>> getTripsByUserId(@PathVariable Long userId) {
-        return ResponseEntity.ok(tripService.getTripsByUserId(userId));
+    @GetMapping("/user/{email}")
+    public ResponseEntity<List<TripDto>> getTripsByUserEmail(@PathVariable String email) {
+        return ResponseEntity.ok(tripService.getTripsByUserEmail(email));
     }
 
-    @PostMapping
-    public ResponseEntity<TripDto> createTrip(@RequestBody TripDto tripDTO) {
-        return ResponseEntity.ok(tripService.createTrip(tripDTO));
+    @PostMapping("/{email}")
+    public ResponseEntity<TripDto> createTrip(@RequestBody TripDto tripDTO, @PathVariable String email) {
+        return ResponseEntity.ok(tripService.createTrip(tripDTO, email));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TripDto> updateTrip(@RequestBody TripDto tripDTO, @PathVariable Long id) {
+        return ResponseEntity.ok(tripService.updateTrip(id, tripDTO));
     }
 
     @DeleteMapping("/{id}")
