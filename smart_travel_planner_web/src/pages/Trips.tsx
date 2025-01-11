@@ -1,12 +1,14 @@
-import { Box, Button, Container, Typography } from "@mui/material";
+import { Box, Button, Container, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import TripCard from "../components/TripCard";
 import TripModal from "../components/TripModal";
+import TripSuggestionModal from "../components/TripSuggestionModal";
 import {
   useCreateTrip,
   useDeleteTrip,
   useEditTrip,
+  useSuggestTrips,
   useTripsByEmail,
 } from "../hooks/useTrips";
 import { Trip } from "../types/Trip";
@@ -19,15 +21,21 @@ const Trips: React.FC = () => {
   const createTripMutation = useCreateTrip();
   const editTripMutation = useEditTrip();
   const deleteTripMutation = useDeleteTrip();
+  const suggestTripsMutation = useSuggestTrips();
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [suggestionModalOpen, setSuggestionModalOpen] = useState(false);
+  const [tripSuggestion, setTripSuggestion] = useState<string>(""); // Holds the suggestion string
   const [editingTrip, setEditingTrip] = useState<Trip | null>(null);
+  const [interests, setInterests] = useState<string>("");
 
   const handleDelete = (tripId: number) => deleteTripMutation.mutate(tripId);
+
   const handleEdit = (trip: Trip) => {
     setEditingTrip(trip);
     setModalOpen(true);
   };
+
   const handleCreate = () => {
     setEditingTrip(null);
     setModalOpen(true);
@@ -43,6 +51,18 @@ const Trips: React.FC = () => {
     setModalOpen(false);
   };
 
+  const handleSuggestTrips = () => {
+    suggestTripsMutation.mutate(interests.split(","), {
+      onSuccess: (suggestion) => {
+        setTripSuggestion(suggestion.toString()); // Save the suggestion string
+        setSuggestionModalOpen(true); // Open the modal
+      },
+      onError: () => {
+        alert("Failed to fetch suggestion. Please try again.");
+      },
+    });
+  };
+
   if (isLoading) return <Typography>Loading trips...</Typography>;
   if (error) return <Typography>Error fetching trips.</Typography>;
 
@@ -51,14 +71,24 @@ const Trips: React.FC = () => {
       <Typography variant="h4" color="primary" gutterBottom>
         Trips for {email}
       </Typography>
-      <Button
-        variant="contained"
-        color="primary"
-        sx={{ marginBottom: 3 }}
-        onClick={handleCreate}
-      >
-        Create Trip
-      </Button>
+      <Box sx={{ display: "flex", gap: 2, marginBottom: 3 }}>
+        <Button variant="contained" color="primary" onClick={handleCreate}>
+          Create Trip
+        </Button>
+        <TextField
+          fullWidth
+          placeholder="Enter interests (comma-separated)"
+          value={interests}
+          onChange={(e) => setInterests(e.target.value)}
+        />
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={handleSuggestTrips}
+        >
+          Suggest Trip
+        </Button>
+      </Box>
       {trips?.length ? (
         <Box
           sx={{
@@ -84,6 +114,11 @@ const Trips: React.FC = () => {
         onClose={() => setModalOpen(false)}
         onSave={handleSave}
         initialData={editingTrip || undefined}
+      />
+      <TripSuggestionModal
+        open={suggestionModalOpen}
+        onClose={() => setSuggestionModalOpen(false)}
+        suggestion={tripSuggestion} // Pass the suggestion string
       />
     </Container>
   );

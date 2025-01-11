@@ -22,3 +22,9 @@ export const editTrip = async (trip: Partial<Trip>): Promise<Trip> => {
   const { data } = await axios.put(`${API_BASE_URL}/${trip.id}`, trip);
   return data;
 };
+
+export const suggestTrips = async (interests: string[]): Promise<String> => {
+  const { data } = await axios.post(`${API_BASE_URL}/suggestion`, interests);
+  console.log(data)
+  return data;
+};

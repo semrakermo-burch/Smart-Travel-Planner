@@ -79,7 +79,7 @@ public class TripService {
     }
 
     public List<TripDto> getTripsByUserEmail(String email) {
-        return tripRepository.findByUserEmail(email).stream()
+        return tripRepository.findByUserEmailOrderByStartDateDesc(email).stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }

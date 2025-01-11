@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createTrip, deleteTrip, editTrip, fetchTripsByEmail } from "../api/tripsApi";
+import { createTrip, deleteTrip, editTrip, fetchTripsByEmail, suggestTrips } from "../api/tripsApi";
 import { Trip } from "../types/Trip";
 
 export const useTripsByEmail = (email: string) => {
@@ -43,4 +43,8 @@ export const useCreateTrip = () => {
             queryClient.invalidateQueries({ queryKey: ["trips"] }); // Refresh trip list
         },
     });
+};
+
+export const useSuggestTrips = () => {
+    return useMutation<String, Error, string[]>({ mutationFn: suggestTrips });
 };

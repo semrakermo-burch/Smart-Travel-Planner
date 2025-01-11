@@ -20,7 +20,7 @@ public class OpenAITripSuggester implements TripSuggester {
                 "Suggest the user of a smart travel planner application a new trip to take in the following manner: " +
                 "```" +
                 "Location: (City, Country)" +
-                "Activities: (List of activities the user can do there, max 3)" +
+                "Activities: (List of activities the user can do there, max 3 activities with just their titles, not full sentences)" +
                 "Reason: (Reason to take this trip and visit this city, max 1 sentence)" +
                 "```" +
                 "This suggestion should be based on the following user interests : " +

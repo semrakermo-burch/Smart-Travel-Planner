@@ -8,5 +8,5 @@ import java.util.List;
 public interface TripRepository extends JpaRepository<Trip, Long> {
     List<Trip> findByStatus(String status); // Find trips by status (Upcoming/Completed)
     List<Trip> findByCityName(String cityName); // Find trips by associated city's name
-    List<Trip> findByUserEmail(String email); // Find trips by associated user's ID
+    List<Trip> findByUserEmailOrderByStartDateDesc(String email);
 }

@@ -5,6 +5,7 @@ import {
   Card,
   CardActions,
   CardContent,
+  Chip,
   IconButton,
   Typography,
 } from "@mui/material";
@@ -48,6 +49,11 @@ const TripCard: React.FC<TripCardProps> = ({ trip, onDelete, onEdit }) => {
         <Typography variant="body2" color="text.secondary">
           {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
         </Typography>
+        <Chip
+          label={trip.status}
+          color={trip.status === "Upcoming" ? "primary" : "success"}
+          sx={{ marginTop: 2 }}
+        />
       </CardContent>
       <CardActions>
         <IconButton color="primary" onClick={handleEdit}>

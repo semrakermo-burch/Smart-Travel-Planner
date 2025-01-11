@@ -15,8 +15,8 @@ import { Trip } from "../types/Trip";
 interface TripModalProps {
   open: boolean;
   onClose: () => void;
-  onSave: (trip: Partial<Trip>) => void; // Callback to save the trip
-  initialData?: Partial<Trip>; // Initial data for editing
+  onSave: (trip: Partial<Trip>) => void;
+  initialData?: Partial<Trip>;
 }
 
 const TripModal: React.FC<TripModalProps> = ({
@@ -37,11 +37,11 @@ const TripModal: React.FC<TripModalProps> = ({
     if (initialData) {
       setFormData({
         ...initialData,
-        startDate: initialData.startDate?.split("T")[0], // Format to YYYY-MM-DD
-        endDate: initialData.endDate?.split("T")[0], // Format to YYYY-MM-DD
+        startDate: initialData.startDate?.split("T")[0],
+        endDate: initialData.endDate?.split("T")[0],
       });
     } else {
-      setFormData({});
+      setFormData({ status: "Upcoming" }); // Default status for new trips
     }
   }, [initialData]);
 
@@ -50,6 +50,13 @@ const TripModal: React.FC<TripModalProps> = ({
     (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setFormData({ ...formData, [field]: event.target.value });
     };
+
+  const handleStatusChange = (event: SelectChangeEvent<string>) => {
+    setFormData({
+      ...formData,
+      status: event.target.value as "Upcoming" | "Completed",
+    });
+  };
 
   const handleCityChange = (event: SelectChangeEvent<number>) => {
     const selectedCity = cities?.find(
@@ -133,6 +140,18 @@ const TripModal: React.FC<TripModalProps> = ({
           InputLabelProps={{ shrink: true }} // Prevents label overlap
           sx={{ mb: 2 }}
         />
+        <Typography variant="body1" sx={{ mb: 1 }}>
+          Status
+        </Typography>
+        <Select
+          fullWidth
+          value={formData.status || "Upcoming"}
+          onChange={handleStatusChange}
+          sx={{ mb: 2 }}
+        >
+          <MenuItem value="Upcoming">Upcoming</MenuItem>
+          <MenuItem value="Completed">Completed</MenuItem>
+        </Select>
         <Typography variant="body1" sx={{ mb: 1 }}>
           Select City
         </Typography>
