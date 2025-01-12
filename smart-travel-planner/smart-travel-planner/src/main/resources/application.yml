@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: ${db_url}
+    username: ${db_username}
+    password: ${db_password}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: false
+
+openai:
+  secret: ${openai_sk}
+
+weatherapi:
+  url: https://api.weatherapi.com/v1
+  key: ${weatherapi_key}
