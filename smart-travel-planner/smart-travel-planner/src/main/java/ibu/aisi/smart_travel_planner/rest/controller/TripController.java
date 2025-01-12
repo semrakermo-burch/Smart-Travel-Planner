@@ -60,9 +60,9 @@ public class TripController {
     }
 
     @GetMapping("/{id}/weather-forecast")
-    public WeatherDto getWeatherForTrip(Long tripId) {
+    public WeatherDto getWeatherForTrip(@PathVariable Long id) {
         // Fetch Trip (Assume trip exists)
-        TripDto trip = tripService.getTripById(tripId);
+        TripDto trip = tripService.getTripById(id);
         LocalDate startDate = trip.getStartDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
         return weatherService.getWeatherForecast(trip.getCity().getName(), startDate);
     }

@@ -16,6 +16,7 @@ interface TripCardProps {
   trip: Trip;
   onDelete: (id: number) => void;
   onEdit: (trip: Trip) => void;
+  onCheckWeather: (tripId: number) => void; // Callback to fetch weather
 }
 
 const formatDate = (dateString: string) => {
@@ -23,9 +24,15 @@ const formatDate = (dateString: string) => {
   return new Intl.DateTimeFormat("en-GB").format(date); // Formats as DD.MM.YYYY
 };
 
-const TripCard: React.FC<TripCardProps> = ({ trip, onDelete, onEdit }) => {
+const TripCard: React.FC<TripCardProps> = ({
+  trip,
+  onDelete,
+  onEdit,
+  onCheckWeather,
+}) => {
   const handleDelete = () => onDelete(trip.id);
   const handleEdit = () => onEdit(trip);
+  const handleCheckWeather = () => onCheckWeather(trip.id);
 
   return (
     <Card
@@ -73,6 +80,15 @@ const TripCard: React.FC<TripCardProps> = ({ trip, onDelete, onEdit }) => {
           }}
         >
           Delete
+        </Button>
+        <Button
+          size="small"
+          variant="outlined"
+          color="primary"
+          onClick={handleCheckWeather}
+          sx={{ marginLeft: "auto" }}
+        >
+          Check Weather
         </Button>
       </CardActions>
     </Card>

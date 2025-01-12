@@ -4,12 +4,14 @@ import { useSearchParams } from "react-router-dom";
 import TripCard from "../components/TripCard";
 import TripModal from "../components/TripModal";
 import TripSuggestionModal from "../components/TripSuggestionModal";
+import WeatherModal from "../components/WeatherModal";
 import {
   useCreateTrip,
   useDeleteTrip,
   useEditTrip,
   useSuggestTrips,
   useTripsByEmail,
+  useWeather,
 } from "../hooks/useTrips";
 import { Trip } from "../types/Trip";
 
@@ -27,7 +29,14 @@ const Trips: React.FC = () => {
   const [suggestionModalOpen, setSuggestionModalOpen] = useState(false);
   const [tripSuggestion, setTripSuggestion] = useState<string>(""); // Holds the suggestion string
   const [editingTrip, setEditingTrip] = useState<Trip | null>(null);
+  const [selectedTripId, setSelectedTripId] = useState<number | null>(null);
   const [interests, setInterests] = useState<string>("");
+
+  const {
+    data: weatherData,
+    isLoading: weatherLoading,
+    error: weatherError,
+  } = useWeather(selectedTripId);
 
   const handleDelete = (tripId: number) => deleteTripMutation.mutate(tripId);
 
@@ -61,6 +70,14 @@ const Trips: React.FC = () => {
         alert("Failed to fetch suggestion. Please try again.");
       },
     });
+  };
+
+  const handleCheckWeather = (tripId: number) => {
+    if (!tripId) {
+      alert("Invalid trip ID provided. Cannot fetch weather data.");
+      return;
+    }
+    setSelectedTripId(tripId); // Set the trip ID for fetching weather
   };
 
   if (isLoading) return <Typography>Loading trips...</Typography>;
@@ -103,6 +120,7 @@ const Trips: React.FC = () => {
               trip={trip}
               onDelete={handleDelete}
               onEdit={handleEdit}
+              onCheckWeather={handleCheckWeather}
             />
           ))}
         </Box>
@@ -114,6 +132,13 @@ const Trips: React.FC = () => {
         onClose={() => setModalOpen(false)}
         onSave={handleSave}
         initialData={editingTrip || undefined}
+      />
+      <WeatherModal
+        open={!!selectedTripId}
+        onClose={() => setSelectedTripId(null)}
+        weatherData={weatherData || null}
+        loading={weatherLoading}
+        error={!!weatherError}
       />
       <TripSuggestionModal
         open={suggestionModalOpen}

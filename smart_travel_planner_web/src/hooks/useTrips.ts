@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createTrip, deleteTrip, editTrip, fetchTripsByEmail, suggestTrips } from "../api/tripsApi";
+import { createTrip, deleteTrip, editTrip, fetchTripsByEmail, fetchWeather, suggestTrips, WeatherResponse } from "../api/tripsApi";
 import { Trip } from "../types/Trip";
 
 export const useTripsByEmail = (email: string) => {
@@ -47,4 +47,18 @@ export const useCreateTrip = () => {
 
 export const useSuggestTrips = () => {
     return useMutation<String, Error, string[]>({ mutationFn: suggestTrips });
+};
+
+export const useWeather = (tripId: number | null) => {
+    return useQuery<WeatherResponse, Error>(
+        {
+            queryKey: ["weather", tripId],
+            queryFn: () => fetchWeather(tripId!),
+
+            enabled: !!tripId, // Only fetch when tripId is valid
+            refetchOnWindowFocus: false, // Disable refetching on window focus
+            refetchOnMount: false, // Optionally disable refetching on mount
+
+        }
+    );
 };

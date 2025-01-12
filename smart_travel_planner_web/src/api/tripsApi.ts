@@ -25,6 +25,17 @@ export const editTrip = async (trip: Partial<Trip>): Promise<Trip> => {
 
 export const suggestTrips = async (interests: string[]): Promise<String> => {
   const { data } = await axios.post(`${API_BASE_URL}/suggestion`, interests);
-  console.log(data)
+  return data;
+};
+
+export interface WeatherResponse {
+  city: string;
+  date: string;
+  temperature: number;
+  condition: string;
+}
+
+export const fetchWeather = async (tripId: number): Promise<WeatherResponse> => {
+  const { data } = await axios.get(`${API_BASE_URL}/${tripId}/weather-forecast`);
   return data;
 };
