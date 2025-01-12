@@ -22,17 +22,6 @@ public class TripController {
         this.weatherService = weatherService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<TripDto>> getAllTrips() {
-        return ResponseEntity.ok(tripService.getAllTrips());
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<TripDto> getTripById(@PathVariable Long id) {
-        TripDto tripDto =  tripService.getTripById(id);
-        return tripDto != null ? ResponseEntity.ok(tripDto) : ResponseEntity.notFound().build();
-    }
-
     @GetMapping("/user/{email}")
     public ResponseEntity<List<TripDto>> getTripsByUserEmail(@PathVariable String email) {
         return ResponseEntity.ok(tripService.getTripsByUserEmail(email));
