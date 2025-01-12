@@ -60,7 +60,7 @@ public class TripService {
         Optional<City> city = cityRepository.findById(tripDTO.getCityId());
         city.ifPresent(trip::setCity);
 
-        tripRepository.save(trip);
+        trip = tripRepository.save(trip);
         return mapToDto(trip);
     }
 

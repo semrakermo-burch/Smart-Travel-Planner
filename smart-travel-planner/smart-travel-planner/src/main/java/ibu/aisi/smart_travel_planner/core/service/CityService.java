@@ -42,8 +42,9 @@ public class CityService {
                 .name(cityDTO.getName())
                 .country(cityDTO.getCountry())
                 .build();
-        City savedCity = cityRepository.save(city);
-        return mapToDto(savedCity);
+        city = cityRepository.save(city);
+        System.out.println(city);
+        return mapToDto(city);
     }
 
     public void deleteCity(Long id) {
