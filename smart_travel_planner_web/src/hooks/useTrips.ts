@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 import { createTrip, deleteTrip, editTrip, fetchTripsByEmail, fetchWeather, suggestTrips, WeatherResponse } from "../api/tripsApi";
 import { Trip } from "../types/Trip";
 
@@ -17,7 +18,7 @@ export const useDeleteTrip = () => {
     return useMutation<void, Error, number>({
         mutationFn: deleteTrip, // Use mutationFn to correctly type the mutation function
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['trips'] }); // Pass the query key as a string
+            queryClient.invalidateQueries({ queryKey: ['filteredTrips'] }); // Pass the query key as a string
         },
     });
 };
@@ -28,7 +29,7 @@ export const useEditTrip = () => {
     return useMutation<Trip, Error, Partial<Trip>>({
         mutationFn: editTrip,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["trips"] }); // Refresh trip list
+            queryClient.invalidateQueries({ queryKey: ["filteredTrips"] }); // Refresh trip list
         },
     });
 };
@@ -40,7 +41,7 @@ export const useCreateTrip = () => {
     return useMutation<Trip, Error, { trip: Partial<Trip>, email: string }>({
         mutationFn: ({ trip, email }) => createTrip(trip, email), // Pass both trip data and email to createTrip
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["trips"] }); // Refresh trip list
+            queryClient.invalidateQueries({ queryKey: ["filteredTrips"] }); // Refresh trip list
         },
     });
 };
@@ -60,5 +61,30 @@ export const useWeather = (tripId: number | null) => {
             refetchOnMount: false, // Optionally disable refetching on mount
 
         }
+    );
+};
+
+export const useFilteredTrips = (
+    email: string,
+    filters: {
+        name?: string;
+        description?: string;
+        startDate?: string;
+        endDate?: string;
+        cityId?: number;
+        status?: string;
+        sortBy?: string; // Add sortBy to the query
+        sortDirection?: string; // Add sortDirection to the query
+    }
+) => {
+    return useQuery<Trip[]>({
+        queryKey: ["filteredTrips", email, filters],
+        queryFn: async () => {
+            const params = { ...filters }; // Add all filter parameters to the request
+            const response = await axios.get(`http://localhost:8080/api/trips/filter/${email}`, { params });
+            return response.data;
+        },
+        enabled: !!email, // Only fetch if email is provided
+    }
     );
 };
