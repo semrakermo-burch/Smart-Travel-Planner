@@ -3,7 +3,7 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 FROM openjdk:21-jdk-slim
-COPY --from=build /target/ai-todo-0.0.1-SNAPSHOT.jar smart-travel-planner.jar
+COPY --from=build /target/smart-travel-planner-0.0.1-SNAPSHOT.jar smart-travel-planner.jar
 EXPOSE 8080
 
 ENTRYPOINT ["java","-jar","smart-travel-planner.jar"]
