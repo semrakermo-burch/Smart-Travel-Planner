@@ -8,9 +8,13 @@ import ibu.aisi.smart_travel_planner.core.model.User;
 import ibu.aisi.smart_travel_planner.core.repository.CityRepository;
 import ibu.aisi.smart_travel_planner.core.repository.TripRepository;
 import ibu.aisi.smart_travel_planner.core.repository.UserRepository;
+import ibu.aisi.smart_travel_planner.core.specification.TripSpecification;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -79,7 +83,37 @@ public class TripService {
     }
 
     public List<TripDto> getTripsByUserEmail(String email) {
-        return tripRepository.findByUserEmailOrderByStartDateDesc(email).stream()
+            return tripRepository.findByUserEmailOrderByStartDateDesc(email).stream()
+                    .map(this::mapToDto)
+                    .collect(Collectors.toList());
+    }
+
+    public List<TripDto> filterAndSortTrips(
+            String email,
+            String name,
+            String description,
+            Date startDate,
+            Date endDate,
+            String status,
+            Long cityId,
+            String sortBy,
+            String sortDirection) {
+
+        Specification<Trip> spec = Specification.where(TripSpecification.hasName(name))
+                .and(TripSpecification.hasDescription(description))
+                .and(TripSpecification.hasStartDate(startDate))
+                .and(TripSpecification.hasEndDate(endDate))
+                .and(TripSpecification.hasStatus(status))
+                .and(TripSpecification.hasCityId(cityId))
+                .and(TripSpecification.hasUserEmail(email));
+
+        Sort sort = Sort.by(
+                sortDirection != null && sortDirection.equalsIgnoreCase("desc")
+                        ? Sort.Direction.DESC
+                        : Sort.Direction.ASC,
+                sortBy != null ? sortBy : "id");
+
+        return tripRepository.findAll(spec, sort).stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }

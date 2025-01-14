@@ -1,16 +1,22 @@
-import { Box, Button, Container, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Container,
+  MenuItem,
+  TextField,
+  Typography,
+} from "@mui/material";
 import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import TripCard from "../components/TripCard";
 import TripModal from "../components/TripModal";
-import TripSuggestionModal from "../components/TripSuggestionModal";
 import WeatherModal from "../components/WeatherModal";
+import { useCities } from "../hooks/useCities";
 import {
   useCreateTrip,
   useDeleteTrip,
   useEditTrip,
-  useSuggestTrips,
-  useTripsByEmail,
+  useFilteredTrips,
   useWeather,
 } from "../hooks/useTrips";
 import { Trip } from "../types/Trip";
@@ -19,24 +25,47 @@ const Trips: React.FC = () => {
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email") || "";
 
-  const { data: trips, isLoading, error } = useTripsByEmail(email);
+  const [filters, setFilters] = useState({
+    name: "",
+    description: "",
+    startDate: "",
+    endDate: "",
+    cityId: null,
+    status: "",
+    sortBy: "", // Sorting field
+    sortDirection: "asc", // Sorting direction (default to ascending)
+  });
+
+  const filteredParams = {
+    ...filters,
+    cityId: filters.cityId ?? undefined, // Convert null to undefined
+    sortBy: filters.sortBy || undefined, // Ensure blank values are not sent
+    sortDirection: filters.sortDirection || "asc",
+  };
+
+  const {
+    data: trips,
+    isLoading,
+    error,
+  } = useFilteredTrips(email, filteredParams);
+  const { data: cities } = useCities(); // Fetch cities for dropdown
   const createTripMutation = useCreateTrip();
   const editTripMutation = useEditTrip();
   const deleteTripMutation = useDeleteTrip();
-  const suggestTripsMutation = useSuggestTrips();
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [suggestionModalOpen, setSuggestionModalOpen] = useState(false);
-  const [tripSuggestion, setTripSuggestion] = useState<string>(""); // Holds the suggestion string
   const [editingTrip, setEditingTrip] = useState<Trip | null>(null);
   const [selectedTripId, setSelectedTripId] = useState<number | null>(null);
-  const [interests, setInterests] = useState<string>("");
 
   const {
     data: weatherData,
     isLoading: weatherLoading,
     error: weatherError,
   } = useWeather(selectedTripId);
+
+  const handleFilterChange = (key: keyof typeof filters, value: any) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+  };
 
   const handleDelete = (tripId: number) => deleteTripMutation.mutate(tripId);
 
@@ -60,18 +89,6 @@ const Trips: React.FC = () => {
     setModalOpen(false);
   };
 
-  const handleSuggestTrips = () => {
-    suggestTripsMutation.mutate(interests.split(","), {
-      onSuccess: (suggestion) => {
-        setTripSuggestion(suggestion.toString()); // Save the suggestion string
-        setSuggestionModalOpen(true); // Open the modal
-      },
-      onError: () => {
-        alert("Failed to fetch suggestion. Please try again.");
-      },
-    });
-  };
-
   const handleCheckWeather = (tripId: number) => {
     if (!tripId) {
       alert("Invalid trip ID provided. Cannot fetch weather data.");
@@ -80,33 +97,143 @@ const Trips: React.FC = () => {
     setSelectedTripId(tripId); // Set the trip ID for fetching weather
   };
 
-  if (isLoading) return <Typography>Loading trips...</Typography>;
-  if (error) return <Typography>Error fetching trips.</Typography>;
-
   return (
     <Container maxWidth="lg" sx={{ marginTop: 4 }}>
-      <Typography variant="h4" color="primary" gutterBottom>
-        Trips for {email}
-      </Typography>
-      <Box sx={{ display: "flex", gap: 2, marginBottom: 3 }}>
-        <Button variant="contained" color="primary" onClick={handleCreate}>
+      <Box
+        sx={{
+          display: "flex",
+          marginBottom: 2,
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Typography
+          variant="h4"
+          color="primary"
+          gutterBottom
+          sx={{ marginBottom: 2 }}
+        >
+          Trips for {email}
+        </Typography>
+        <Button variant="contained" color="secondary" onClick={handleCreate}>
           Create Trip
         </Button>
-        <TextField
-          fullWidth
-          placeholder="Enter interests (comma-separated)"
-          value={interests}
-          onChange={(e) => setInterests(e.target.value)}
-        />
-        <Button
-          variant="outlined"
-          color="secondary"
-          onClick={handleSuggestTrips}
-        >
-          Suggest Trip
-        </Button>
       </Box>
-      {trips?.length ? (
+      <Box
+        sx={{
+          display: "flex",
+          gap: 2,
+          marginBottom: 3,
+          alignItems: "center",
+          width: "100%",
+          justifyContent: "space-between",
+        }}
+      >
+        <TextField
+          variant="outlined"
+          size="small"
+          placeholder="Search by name"
+          value={filters.name}
+          onChange={(e) => handleFilterChange("name", e.target.value)}
+          label="Name" // Use label instead of placeholder
+          InputLabelProps={{ shrink: true }} // Keep label visible even when value is set
+        />
+        <TextField
+          variant="outlined"
+          size="small"
+          placeholder="Search by description"
+          value={filters.description}
+          onChange={(e) => handleFilterChange("description", e.target.value)}
+          label="Description" // Use label instead of placeholder
+          InputLabelProps={{ shrink: true }} // Keep label visible even when value is set
+        />
+        <TextField
+          type="date"
+          size="small"
+          label="Start Date" // Use label instead of placeholder
+          InputLabelProps={{ shrink: true }} // Keep label visible even when value is set
+          value={filters.startDate || ""}
+          onChange={(e) => handleFilterChange("startDate", e.target.value)}
+        />
+        <TextField
+          type="date"
+          size="small"
+          label="End Date" // Use label instead of placeholder
+          InputLabelProps={{ shrink: true }} // Keep label visible even when value is set
+          value={filters.endDate || ""}
+          onChange={(e) => handleFilterChange("endDate", e.target.value)}
+        />
+        <TextField
+          select
+          size="small"
+          value={filters.cityId !== null ? filters.cityId : ""} // Show "All Cities" by default
+          onChange={(e) =>
+            handleFilterChange(
+              "cityId",
+              e.target.value ? Number(e.target.value) : null
+            )
+          }
+          label="City" // Use label instead of placeholder
+          InputLabelProps={{ shrink: true }} // Keep label visible even when value is set
+          sx={{ minWidth: "80px" }}
+        >
+          <MenuItem value="">All Cities</MenuItem> {/* Default option */}
+          {cities?.map((city) => (
+            <MenuItem key={city.id} value={city.id}>
+              {city.name}
+            </MenuItem>
+          ))}
+        </TextField>
+        <TextField
+          select
+          size="small"
+          value={filters.status || ""} // Show "All Statuses" by default
+          onChange={(e) => handleFilterChange("status", e.target.value)}
+          label="Status" // Use label instead of placeholder
+          InputLabelProps={{ shrink: true }} // Keep label visible even when value is set
+          sx={{ minWidth: "80px" }}
+        >
+          <MenuItem value="">All Statuses</MenuItem> {/* Default option */}
+          <MenuItem value="Upcoming">Upcoming</MenuItem>
+          <MenuItem value="Completed">Completed</MenuItem>
+        </TextField>
+
+        <TextField
+          select
+          size="small"
+          value={filters.sortBy}
+          onChange={(e) => handleFilterChange("sortBy", e.target.value)}
+          label="Sort By"
+          InputLabelProps={{ shrink: true }}
+          sx={{ minWidth: "80px" }}
+        >
+          <MenuItem value="">None</MenuItem> {/* Default option */}
+          <MenuItem value="name">Name</MenuItem>
+          <MenuItem value="description">Description</MenuItem>
+          <MenuItem value="startDate">Start Date</MenuItem>
+          <MenuItem value="endDate">End Date</MenuItem>
+          <MenuItem value="status">Status</MenuItem>
+          <MenuItem value="cityId">City</MenuItem>
+        </TextField>
+        <TextField
+          select
+          size="small"
+          value={filters.sortDirection}
+          onChange={(e) => handleFilterChange("sortDirection", e.target.value)}
+          label="Sort Direction"
+          InputLabelProps={{ shrink: true }}
+          sx={{ minWidth: "150px" }}
+        >
+          <MenuItem value="asc">Ascending</MenuItem>
+          <MenuItem value="desc">Descending</MenuItem>
+        </TextField>
+      </Box>
+      {/* Render trips */}
+      {isLoading ? (
+        <Typography>Loading trips...</Typography>
+      ) : error ? (
+        <Typography>Error fetching trips.</Typography>
+      ) : trips?.length ? (
         <Box
           sx={{
             display: "grid",
@@ -139,11 +266,6 @@ const Trips: React.FC = () => {
         weatherData={weatherData || null}
         loading={weatherLoading}
         error={!!weatherError}
-      />
-      <TripSuggestionModal
-        open={suggestionModalOpen}
-        onClose={() => setSuggestionModalOpen(false)}
-        suggestion={tripSuggestion} // Pass the suggestion string
       />
     </Container>
   );

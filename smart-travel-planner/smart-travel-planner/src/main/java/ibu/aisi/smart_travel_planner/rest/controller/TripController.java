@@ -3,11 +3,15 @@ package ibu.aisi.smart_travel_planner.rest.controller;
 import ibu.aisi.smart_travel_planner.api.impl.weatherapi.WeatherApiWeatherForecast;
 import ibu.aisi.smart_travel_planner.core.dto.TripDto;
 import ibu.aisi.smart_travel_planner.core.dto.WeatherDto;
+import ibu.aisi.smart_travel_planner.core.model.City;
+import ibu.aisi.smart_travel_planner.core.model.Trip;
 import ibu.aisi.smart_travel_planner.core.service.TripService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -66,6 +70,27 @@ public class TripController {
         LocalDate startDate = trip.getStartDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
         return weatherService.getWeatherForecast(trip.getCity().getName(), startDate);
     }
+
+    @GetMapping("/filter/{email}")
+    public ResponseEntity<List<TripDto>> filterAndSortTrips(
+            @PathVariable String email,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long cityId,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortDirection) {
+
+        List<TripDto> tripsDtos = tripService.filterAndSortTrips(
+                email, name, description, startDate, endDate, status, cityId, sortBy, sortDirection);
+
+        return ResponseEntity.ok(tripsDtos);
     }
+
+}
 
 
