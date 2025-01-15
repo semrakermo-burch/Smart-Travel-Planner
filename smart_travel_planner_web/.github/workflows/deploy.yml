@@ -1,0 +1,57 @@
+name: Deploy Frontend to Render
+
+on:
+  release:
+    types: [published] # Trigger the workflow when a release is published
+  push:
+    tags:
+      - 'v*' # Trigger the workflow for tags starting with 'v'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Install Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18 # Use the Node.js version your project requires
+
+      # Step 3: Install dependencies and build the project
+      - name: Install dependencies and build
+        run: |
+          npm install
+          npm run build # Ensure this is the correct build script for your project
+
+      # Step 4: Install Render CLI
+      - name: Install Render CLI
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/render-oss/cli/refs/heads/main/bin/install.sh | sh
+
+      # Step 5: Set Render Workspace
+      - name: Set Render Workspace
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        run: |
+          render workspace set travelplanner-workspace -o json
+
+      # Step 6: Get Commit SHA
+      - name: Get Commit SHA
+        id: git-info
+        run: echo "commit=$(git rev-parse HEAD)" >> $GITHUB_ENV
+
+      # Step 7: Verify Render CLI Installation
+      - name: Verify Render CLI Installation
+        run: render --version
+
+      # Step 8: Deploy the frontend to Render
+      - name: Deploy to Render
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        run: |
+          render deploys create ${{ secrets.RENDER_SERVICE_ID }} --commit ${{ env.commit }} -o json --confirm

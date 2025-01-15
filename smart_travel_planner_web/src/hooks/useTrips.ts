@@ -81,7 +81,7 @@ export const useFilteredTrips = (
         queryKey: ["filteredTrips", email, filters],
         queryFn: async () => {
             const params = { ...filters }; // Add all filter parameters to the request
-            const response = await axios.get(`http://localhost:8080/api/trips/filter/${email}`, { params });
+            const response = await axios.get(`https://smart-travel-planner-live.onrender.com/api/trips/filter/${email}`, { params });
             return response.data;
         },
         enabled: !!email, // Only fetch if email is provided

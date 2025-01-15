@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Trip } from "../types/Trip";
 
-const API_BASE_URL = "http://localhost:8080/api/trips";
+const API_BASE_URL = "https://smart-travel-planner-live.onrender.com/api/trips";
 
 export const fetchTripsByEmail = async (email: string): Promise<Trip[]> => {
   const { data } = await axios.get(`${API_BASE_URL}/user/${email}`);
