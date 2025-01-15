@@ -79,7 +79,7 @@ const TripModal: React.FC<TripModalProps> = ({
       { name: newCityName, country: newCityCountry },
       {
         onSuccess: (newCity) => {
-          setFormData({ ...formData, city: newCity });
+          setFormData({ ...formData, city: newCity, cityId: newCity.id });
           setIsCreatingCity(false);
           setNewCityName("");
           setNewCityCountry("");
